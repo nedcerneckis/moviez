@@ -1,0 +1,68 @@
+.movie-card {
+    width : 100%;
+    height: 300px;
+    margin: 20px;
+}
+
+.see-more {
+    position: absolute;
+    justify-content: flex-end;
+    bottom: 10%;
+}
+
+.search-bar {
+    min-width: 150px;
+    max-width: 500px;
+    position: center;
+    margin: auto; 
+    padding: 20px;
+    
+}
+
+form {
+    display: flex;
+}
+
+.submit-filter-search {
+    display: flex;
+}
+
+mat-icon {
+    cursor: pointer;
+    margin: auto;
+}
+
+.submit-button {
+    height: 30px;
+    margin: 20px;
+    text-align: center;
+}
+
+.current-page {
+    text-align: center;
+}
+
+.form-field {
+    width: 100%;
+}
+
+.stars-icon {
+    transform: scale(0.75);
+}
+
+section {
+  display: table;
+  margin: auto;
+}
+
+
+.button-row {
+  display: inline-block;
+  width: 600px;
+  margin: 10px;
+  padding: 10px;
+}
+
+.numbered-buttons {
+    display: inline-block;
+}

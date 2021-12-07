@@ -1,0 +1,55 @@
+.movie-card {
+    border-radius: 5px;
+    display: flex;
+    margin: 30px auto;
+    box-shadow: 0 5px 20px 10px rgba(0, 0, 0, .2);
+    overflow: hidden;
+    width: 50rem;
+}
+
+.review-card {
+    margin: 10px;
+    padding: 10px;
+}
+
+.movie_image {
+    width: 100%;
+    display: block;
+}
+
+.mat-card-footer {
+    margin: 0.5em;
+}
+
+.poster {
+    width: 320px;
+    margin: auto;
+}
+
+.movie-hero {
+    flex: 0 0 45%;
+}
+
+.content {
+    padding: 20px;
+}
+
+section {
+  display: table;
+  margin: auto;
+}
+
+.current-page {
+    text-align: center;
+}
+
+.button-row {
+  display: inline-block;
+  width: 600px;
+  margin: 10px;
+  padding: 10px;
+}
+
+.numbered-buttons {
+    display: inline-block;
+}

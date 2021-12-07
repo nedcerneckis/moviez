@@ -1,0 +1,10 @@
+<ng-container *ngIf="authService.isAuthenticated$ | async;
+    else loggedOut">
+    <div *ngIf="authService.user$ | async as user">
+        <h1>Welcome {{ user.name }}</h1>
+        <h1>Your favourite movies:</h1>
+    </div>
+</ng-container>
+
+<ng-template #loggedOut>
+</ng-template>

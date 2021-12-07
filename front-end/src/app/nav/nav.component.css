@@ -1,0 +1,17 @@
+.spacer {
+    flex: 1 1 auto
+}
+
+.movie-search {
+    min-width: 150px;
+    max-width: 500px;
+    width: 50%;
+}
+
+.form {
+    width: 100%;
+}
+
+.logo {
+    padding-right: 15px;
+}

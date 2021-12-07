@@ -1,0 +1,63 @@
+<form class="search-bar">
+    <mat-form-field class="form-field" appearance="fill">
+        <mat-label>
+            <mat-icon>search</mat-icon>Search a movie
+        </mat-label>
+        <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayText">
+            <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                {{ option.original_title }}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+    <div class="submit-filter-search">
+        <button mat-raised-button color="primary" class="submit-button" (click)="onSubmitClick()">Submit</button>
+        <mat-icon (click)="openFilterDialog()">reorder</mat-icon>
+    </div>
+</form>
+
+<mat-grid-list cols="4" rows>
+    <div *ngFor="let movie of movies_list">
+        <mat-grid-tile>
+            <mat-card class="movie-card">
+                <mat-card-title>{{ movie.original_title }}</mat-card-title>
+                <mat-card-subtitle>{{ movie.year }}</mat-card-subtitle>
+                <mat-card-subtitle>{{ movie.production_company }}</mat-card-subtitle>
+                <p><i>{{ movie.genre }}</i></p>
+                <p class="rating-num" *ngFor="">
+                    <mat-icon class="stars-icon">stars</mat-icon>
+                </p>
+                <p></p>
+                <mat-card-content>
+                    <p class="description">{{ (movie.description | slice:0:70) + '...'}}</p>
+                </mat-card-content>
+                <mat-card-actions class="see-more">
+                    <button mat-button class="see-more" [routerLink]="['/movies', movie._id]"
+                        matTooltip="View movie details" label="View movie details">
+                        <mat-icon>expand_circle_down</mat-icon>
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </mat-grid-tile>
+    </div>
+</mat-grid-list>
+
+<p class="current-page">Current Page: {{ page }}</p>
+<section>
+    <div class="button-row">
+        <button mat-stroked-button matToolTipcolor="primary" matTooltip="Go to first page" (click)="firstPage()">
+            <<
+        </button>
+        <button mat-stroked-button color="primary" matTooltip="Go to previous page" (click)="previousPage()">
+            < </button>
+        <div class="numbered-buttons" *ngFor="let i of getPageArray()">
+            <button mat-raised-button color="primary" (click)="goToPage(i)">{{i}}</button>
+        </div>
+        <button mat-stroked-button color="primary" matTooltip="Go to next page" (click)="nextPage()">
+            >
+        </button>
+        <button mat-stroked-button color="primary" matTooltip="Go to last page" (click)="lastPage()">
+            >>
+        </button>
+    </div>
+</section>
