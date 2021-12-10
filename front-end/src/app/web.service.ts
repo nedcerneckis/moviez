@@ -1,62 +1,64 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class WebService {
 
-    api_hostname = 'http://localhost';
-    api_port = ':5000';
-    api_path = '/api/v1.0';
-    api_full_url = this.api_hostname + this.api_port + this.api_path;
+    api_hostname: string = 'http://localhost';
+    api_port: string = ':5000';
+    api_path: string = '/api/v1.0';
+    api_full_url: string = this.api_hostname + this.api_port + this.api_path;
 
     constructor(
         public http: HttpClient
-    ){}
+    ) { }
 
-    getMovies(page: number): any{
+
+    getMovies(page: number): Observable<any> {
         return this.http.get(this.api_full_url + '/movies?pn=' + page);
     }
 
-    getMoviesByFilters(searchTerm: string): any{
-        return this.http.get(this.api_full_url + '/movies/search?original_title=' + searchTerm);
+    getMoviesByFilters(searchTerm: string): Observable<any> {
+        return this.http.get(this.api_full_url + 
+            '/movies/search?original_title=' + searchTerm);
     }
 
-    getAllMovieTitles(): any {
+    getAllMovieTitles(): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/titles');
     }
 
-    getSpecificMovie(id: string): any{
+    getSpecificMovie(id: string): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/' + id);
     }
 
-    getImagePoster(id: string){
+    getImagePoster(id: string): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/img/' + id);
     }
 
-    getRating(id: string){
+    getRating(id: string): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/' + id + '/rating');
     }
 
-    getMaxPage(){
+    getMaxPage(): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/maxpage');
     }
 
-    getReviewMaxPage(id: string){
+    getReviewMaxPage(id: string): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/' + id + '/reviews/maxpage');
     }
 
-    getReviews(id: string, page: number){
+    getReviews(id: string, page: number): Observable<any> {
         return this.http.get(this.api_full_url + '/movies/' + id + '/reviews?pn=' + page);
     }
 
-    addMovie(){
-
+    addMovie() {
     }
 
-    updateMovie(){
+    updateMovie() {
     }
 
-    deleteMovie(){
+    deleteMovie() {
 
     }
 }

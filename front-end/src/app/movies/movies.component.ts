@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { WebService } from '../web.service';
 import { map, startWith } from 'rxjs/operators';
@@ -13,13 +13,14 @@ import { Observable } from 'rxjs';
     styleUrls: ['./movies.component.css']
 })
 export class MoviesComponent implements OnInit {
-    movies_list: any;
+    movies_list: Movie[] = [];
     page: number = 1;
     maxPage: number = 0;
     myControl = new FormControl();
     filteredOptions$?: Observable<any>;
     options: string[] = [];
     searchNameTerm?: string;
+    searchEvent: EventEmitter<string> = new EventEmitter();
 
     constructor(
         private webService: WebService,
@@ -30,6 +31,7 @@ export class MoviesComponent implements OnInit {
         if (sessionStorage['page']) {
             this.page = Number(sessionStorage['page']);
         }
+
         this.fetchMovieList(this.page);
 
         this.webService.getMaxPage().subscribe((data: any) => {
