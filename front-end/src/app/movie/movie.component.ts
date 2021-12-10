@@ -36,6 +36,15 @@ export class MovieComponent implements OnInit {
             });
     }
 
+    updateReviewsList(): void{
+        this.webService
+            .getReviews(this.route.snapshot.params['id'], this.page)
+            .subscribe((data: any) => {
+                this.reviews_list = data;
+            });
+    }
+
+    /*
     updatePagination() {
         this.webService
             .getReviews(this.route.snapshot.params['id'], this.page)
@@ -86,4 +95,5 @@ export class MovieComponent implements OnInit {
         this.page = this.maxPage;
         this.updatePagination()
     }
+    */
 }

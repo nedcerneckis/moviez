@@ -12,7 +12,7 @@ import { Movie } from '../interfaces/movie';
     styleUrls: ['./movies.component.css']
 })
 export class MoviesComponent implements OnInit {
-    movies_list?: Movie[];
+    movies_list: any;
     page: number = 1;
     maxPage: number = 0;
     myControl = new FormControl();
@@ -29,9 +29,8 @@ export class MoviesComponent implements OnInit {
         if (sessionStorage['page']) {
             this.page = Number(sessionStorage['page']);
         }
-        this.webService.getMovies(this.page).subscribe((data: any) => {
-            this.movies_list = data;
-        });
+        this.fetchMovieList(this.page);
+
         this.webService.getMaxPage().subscribe((data: any) => {
             this.maxPage = data['max_page'];
         });
@@ -57,11 +56,19 @@ export class MoviesComponent implements OnInit {
         });
     }
 
-    displayText(movie: any): string {
+    displayText(movie: Movie): string {
         return movie && movie.original_title ? movie.original_title : '';
     }
 
-    openFilterDialog(){
+    fetchMovieList(page: number): void{
+        this.webService
+            .getMovies(page)
+            .subscribe((data: any) => {
+                this.movies_list = data;
+            });
+    }
+
+    openFilterDialog(): void{
         const dialogRef = this.filterDialog.open(FilterDialogComponent, {
             width: '600px',
             data: {searchNameTerm: this.searchNameTerm}
@@ -81,6 +88,7 @@ export class MoviesComponent implements OnInit {
         }
     }
 
+    /*
     updatePagination(): any{
         sessionStorage['page'] = this.page;
         this.webService
@@ -132,4 +140,5 @@ export class MoviesComponent implements OnInit {
         this.page = this.maxPage;
         this.updatePagination()
     }
+    */
 }
