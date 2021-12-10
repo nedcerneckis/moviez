@@ -23,6 +23,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { FilterDialogComponent } from './movies/filter-dialog/filter-dialog.component';
+import { PaginationComponent } from './pagination/pagination.component';
 
 const routes: any = [
   {
@@ -46,7 +47,8 @@ const routes: any = [
     HomeComponent,
     MoviesComponent,
     MovieComponent,
-    FilterDialogComponent
+    FilterDialogComponent,
+    PaginationComponent
   ],
   imports: [
     BrowserModule,

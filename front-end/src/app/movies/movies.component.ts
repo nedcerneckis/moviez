@@ -4,6 +4,7 @@ import { WebService } from '../web.service';
 import { map, startWith } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { FilterDialogComponent } from './filter-dialog/filter-dialog.component';
+import { Movie } from '../interfaces/movie';
 
 @Component({
     selector: 'app-movies',
@@ -11,20 +12,20 @@ import { FilterDialogComponent } from './filter-dialog/filter-dialog.component';
     styleUrls: ['./movies.component.css']
 })
 export class MoviesComponent implements OnInit {
-    movies_list: any = [];
-    page: any = 1;
-    maxPage: any;
+    movies_list?: Movie[];
+    page: number = 1;
+    maxPage: number = 0;
     myControl = new FormControl();
     filteredOptions: any;
     options: any[] = [];
-    searchNameTerm: any;
+    searchNameTerm?: string;
 
     constructor(
         private webService: WebService,
         public filterDialog: MatDialog
     ) { }
 
-    ngOnInit() {
+    ngOnInit(){
         if (sessionStorage['page']) {
             this.page = Number(sessionStorage['page']);
         }
