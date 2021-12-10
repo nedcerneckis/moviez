@@ -11,15 +11,19 @@ section {
   margin: auto;
 }
 
-.numbered-buttons.selected {
-  margin: 8px;
+.button-row {
+  padding: 1em;
+}
+
+.mat-raised-button.mat-success:hover {
+  background-color: #e7e7e7;
 }
 
 .mat-raised-button.mat-success.selected:hover {
-  background-color: rgb(0, 132, 255);
+  background-color: rgb(0, 92, 197);
 }
 
 .mat-raised-button.mat-success.selected {
-  background-color: rgb(0, 92, 197);
+  background-color: rgb(0, 132, 255);
   color: white;
 }

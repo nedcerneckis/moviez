@@ -5,7 +5,7 @@
         </mat-label>
         <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayText">
-            <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            <mat-option *ngFor="let option of filteredOptions$ | async" [value]="option">
                 {{ option.original_title }}
             </mat-option>
         </mat-autocomplete>

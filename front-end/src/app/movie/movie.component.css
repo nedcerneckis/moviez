@@ -13,6 +13,7 @@
 }
 
 .movie_image {
+    min-width: 20em;
     width: 100%;
     display: block;
 }

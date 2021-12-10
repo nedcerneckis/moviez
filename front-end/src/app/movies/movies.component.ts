@@ -5,6 +5,7 @@ import { map, startWith } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { FilterDialogComponent } from './filter-dialog/filter-dialog.component';
 import { Movie } from '../interfaces/movie';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-movies',
@@ -16,8 +17,8 @@ export class MoviesComponent implements OnInit {
     page: number = 1;
     maxPage: number = 0;
     myControl = new FormControl();
-    filteredOptions: any;
-    options: any[] = [];
+    filteredOptions$?: Observable<any>;
+    options: string[] = [];
     searchNameTerm?: string;
 
     constructor(
@@ -25,7 +26,7 @@ export class MoviesComponent implements OnInit {
         public filterDialog: MatDialog
     ) { }
 
-    ngOnInit(){
+    ngOnInit(): void {
         if (sessionStorage['page']) {
             this.page = Number(sessionStorage['page']);
         }
@@ -34,7 +35,7 @@ export class MoviesComponent implements OnInit {
         this.webService.getMaxPage().subscribe((data: any) => {
             this.maxPage = data['max_page'];
         });
-        this.filteredOptions = this.myControl.valueChanges.pipe(
+        this.filteredOptions$ = this.myControl.valueChanges.pipe(
             startWith(''),
             map((value: any) => {
                 return typeof value === 'string' && value.length > 3 ? value : value.original_title
@@ -42,15 +43,15 @@ export class MoviesComponent implements OnInit {
             map((original_title: any) => {
                 return original_title ? this.filterLowerCase(original_title) : this.options.slice(0, 0)
             }),
-            );
+        );
         this.webService.getAllMovieTitles().subscribe((data: any) => {
             this.options = data;
         });
     }
 
-    private filterLowerCase(name: string): any {
+    private filterLowerCase(name: string): string[] {
         const filteredValue = name.toLowerCase();
-        
+
         return this.options.filter((option: any) => {
             return option.original_title.toString().toLowerCase().includes(filteredValue)
         });
@@ -60,7 +61,7 @@ export class MoviesComponent implements OnInit {
         return movie && movie.original_title ? movie.original_title : '';
     }
 
-    fetchMovieList(page: number): void{
+    fetchMovieList(page: number): void {
         this.webService
             .getMovies(page)
             .subscribe((data: any) => {
@@ -68,10 +69,10 @@ export class MoviesComponent implements OnInit {
             });
     }
 
-    openFilterDialog(): void{
+    openFilterDialog(): void {
         const dialogRef = this.filterDialog.open(FilterDialogComponent, {
             width: '600px',
-            data: {searchNameTerm: this.searchNameTerm}
+            data: { searchNameTerm: this.searchNameTerm }
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -79,7 +80,7 @@ export class MoviesComponent implements OnInit {
         });
     }
 
-    onSubmitClick(): any {
+    onSubmitClick(): void {
         if (this.myControl.value) {
             this.webService.getMoviesByFilters(this.myControl.value)
                 .subscribe((data: any) => {
@@ -87,58 +88,4 @@ export class MoviesComponent implements OnInit {
                 });
         }
     }
-
-    /*
-    updatePagination(): any{
-        sessionStorage['page'] = this.page;
-        this.webService
-            .getMovies(this.page)
-            .subscribe((data: any) => {
-                this.movies_list = data;
-            });
-    }
-
-    getPageArray() {
-        if (this.maxPage > 5) {
-            if (this.page > 3 && this.page <= (this.maxPage - 2)) {
-                return [...Array(5).keys()].map(x => x + (this.page - 2));
-            } else if (this.page > (this.maxPage - 2)) {
-                return [...Array(5).keys()].map(x => x + (this.maxPage - 4));
-            } else {
-                return [...Array(5).keys()].map(x => x + 1);
-            }
-        } else {
-            return [...Array(this.maxPage).keys()].map(x => x + 1);
-        }
-    }
-
-    firstPage() {
-        this.page = 1;
-        this.updatePagination()
-    }
-
-    previousPage() {
-        if (this.page > 1) {
-            this.page--;
-            this.updatePagination()
-        }
-    }
-
-    goToPage(page: number) {
-        this.page = page;
-        this.updatePagination()
-    }
-
-    nextPage() {
-        if (this.page < this.maxPage) {
-            this.page++;
-            this.updatePagination()
-        }
-    }
-
-    lastPage() {
-        this.page = this.maxPage;
-        this.updatePagination()
-    }
-    */
 }

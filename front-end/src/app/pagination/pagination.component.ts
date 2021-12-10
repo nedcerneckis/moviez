@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { WebService } from '../web.service';
 
 @Component({
     selector: 'app-pagination',
@@ -7,7 +6,7 @@ import { WebService } from '../web.service';
     styleUrls: ['./pagination.component.css']
 })
 export class PaginationComponent implements OnInit {
-    @Input() maxPage: number = 0;
+    @Input() maxPage: number = 1;
     @Input() page: number = 1;
     @Output() updateItemsList = new EventEmitter();
 
@@ -17,12 +16,12 @@ export class PaginationComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    updatePagination(): any {
+    updatePagination(): void {
         sessionStorage['page'] = this.page;
         this.updateItemsList.emit(this.page)
     }
 
-    getPageArray() {
+    getPageArray(): number[] {
         if (this.maxPage > 5) {
             if (this.page > 3 && this.page <= (this.maxPage - 2)) {
                 return [...Array(5).keys()].map(x => x + (this.page - 2));
@@ -36,31 +35,31 @@ export class PaginationComponent implements OnInit {
         }
     }
 
-    firstPage() {
+    firstPage(): void {
         this.page = 1;
         this.updatePagination()
     }
 
-    previousPage() {
+    previousPage(): void {
         if (this.page > 1) {
             this.page--;
             this.updatePagination()
         }
     }
 
-    goToPage(page: number) {
+    goToPage(page: number): void {
         this.page = page;
         this.updatePagination()
     }
 
-    nextPage() {
+    nextPage(): void {
         if (this.page < this.maxPage) {
             this.page++;
             this.updatePagination()
         }
     }
 
-    lastPage() {
+    lastPage(): void {
         this.page = this.maxPage;
         this.updatePagination()
     }

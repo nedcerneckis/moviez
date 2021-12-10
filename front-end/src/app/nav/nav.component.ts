@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
-import { WebService } from '../web.service';
 
 @Component({
     selector: 'navigation',
@@ -8,7 +7,6 @@ import { WebService } from '../web.service';
     styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
-    movies_list: any = [];
     profileJson: string = '';
 
     constructor(
@@ -20,5 +18,4 @@ export class NavComponent implements OnInit {
             this.profileJson = JSON.stringify(profile, null, 2);
         });
     }
-
 }

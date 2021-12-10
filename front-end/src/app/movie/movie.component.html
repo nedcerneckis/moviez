@@ -1,8 +1,8 @@
 <mat-card class="movie-card">
-    <div class="movie-poster" *ngFor="let poster of movie_poster | async">
+    <div class="movie-poster" *ngFor="let poster of movie_poster$ | async">
         <img class="movie_image" src={{poster.url}}>
     </div>
-    <div class="content" *ngFor="let movie of movie_list | async">
+    <div class="content" *ngFor="let movie of movie_list$ | async">
         <mat-card-title>
             {{ movie.original_title }}
             <mat-card-subtitle>{{ movie.year }}</mat-card-subtitle>
@@ -52,4 +52,5 @@
 <app-pagination
     [maxPage]="maxPage"
     [page]="page"
+    (updateItemsList)="fetchReviewList($event)"
 >
