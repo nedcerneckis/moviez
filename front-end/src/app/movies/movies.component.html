@@ -1,27 +1,73 @@
-<form class="search-bar">
-    <mat-form-field class="form-field" appearance="fill">
-        <mat-label>
-            <mat-icon>search</mat-icon>Search a movie
-        </mat-label>
-        <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayText">
-            <mat-option *ngFor="let option of filteredOptions$ | async" [value]="option">
-                {{ option.original_title }}
-            </mat-option>
-        </mat-autocomplete>
-    </mat-form-field>
-    <div class="submit-filter-search">
-        <button 
-            mat-raised-button 
-            color="primary" 
-            class="submit-button" 
-            (click)="onSubmitClick()"
-            (enter)="onSubmitClick()"
-        >
-            Submit
-        </button>
-        <mat-icon (click)="openFilterDialog()">reorder</mat-icon>
+<form>
+    <div class="search-bar">
+        <mat-form-field class="form-field" appearance="fill">
+            <mat-label>
+                <mat-icon>search</mat-icon>Search a movie
+            </mat-label>
+            <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayText">
+                <mat-option *ngFor="let option of filteredOptions$ | async" [value]="option">
+                    {{ option.original_title }}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+        <div class="submit-filter-search">
+            <a 
+                mat-raised-button 
+                [routerLink]="['/search']"
+                [queryParams]="handleParams()"
+                queryParamsHandling="merge"
+                color="primary" 
+                class="submit-button" 
+            >
+                Submit
+            </a>
+        </div>
     </div>
+    <mat-accordion class="drop-down" multi>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Filters
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Genre</mat-label>
+                <input matInput 
+                    [(ngModel)]="genre"
+                    [ngModelOptions]="{standalone: true}"
+                >
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Language</mat-label>
+                <input 
+                    matInput 
+                    [(ngModel)]="language"
+                    [ngModelOptions]="{standalone: true}"
+                >
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Director</mat-label>
+                <input 
+                    matInput 
+                    [(ngModel)]="director"
+                    [ngModelOptions]="{standalone: true}"
+                >
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Year</mat-label>
+                <input 
+                    matInput 
+                    [(ngModel)]="year"
+                    [ngModelOptions]="{standalone: true}"
+                >
+            </mat-form-field>
+        </mat-expansion-panel>
+    </mat-accordion>
 </form>
 
 <mat-grid-list cols="4" rows>

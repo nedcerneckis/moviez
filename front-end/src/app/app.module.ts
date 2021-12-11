@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { NavComponent } from './nav/nav.component';
 import { HomeComponent } from './home/home.component';
 import { AuthModule } from '@auth0/auth0-angular';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { WebService } from './web.service';
@@ -22,8 +22,9 @@ import { MovieComponent } from './movie/movie.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
-import { FilterDialogComponent } from './movies/filter-dialog/filter-dialog.component';
 import { PaginationComponent } from './pagination/pagination.component';
+import { MoviesSearchComponent } from './movies-search/movies-search.component';
+import { MatExpansionModule } from '@angular/material/expansion'
 
 const routes: any = [
   {
@@ -37,6 +38,10 @@ const routes: any = [
   {
     path: 'movies/:id',
     component: MovieComponent
+  },
+  {
+    path: 'search',
+    component: MoviesSearchComponent
   }
 ];
 
@@ -47,8 +52,8 @@ const routes: any = [
     HomeComponent,
     MoviesComponent,
     MovieComponent,
-    FilterDialogComponent,
-    PaginationComponent
+    PaginationComponent,
+    MoviesSearchComponent
   ],
   imports: [
     BrowserModule,
@@ -70,7 +75,9 @@ const routes: any = [
     MatDialogModule,
     MatTooltipModule,
     MatDividerModule,
-    MatSelectModule
+    MatSelectModule,
+    MatExpansionModule,
+    FormsModule
   ],
   providers: [WebService],
   bootstrap: [AppComponent]

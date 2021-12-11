@@ -19,9 +19,11 @@ export class WebService {
         return this.http.get(this.api_full_url + '/movies?pn=' + page);
     }
 
-    getMoviesByFilters(searchTerm: string): Observable<any> {
-        return this.http.get(this.api_full_url + 
-            '/movies/search?original_title=' + searchTerm);
+    getMoviesByFilters(searchTerm: string, page: number): Observable<any> {
+        return this.http.get(this.api_full_url + '/movies/search?' + 
+            'original_title=' + searchTerm + 
+            '&pn=' + page
+        );
     }
 
     getAllMovieTitles(): Observable<any> {

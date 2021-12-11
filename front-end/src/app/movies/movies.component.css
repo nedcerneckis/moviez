@@ -16,11 +16,12 @@
     position: center;
     margin: auto; 
     padding: 20px;
+    display: flex;
     
 }
 
-form {
-    display: flex;
+mat-expansion-panel {
+    margin: 5px 40%;
 }
 
 .submit-filter-search {

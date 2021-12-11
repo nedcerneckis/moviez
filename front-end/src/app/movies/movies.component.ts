@@ -1,9 +1,7 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { WebService } from '../web.service';
 import { map, startWith } from 'rxjs/operators';
-import { MatDialog } from '@angular/material/dialog';
-import { FilterDialogComponent } from './filter-dialog/filter-dialog.component';
 import { Movie } from '../interfaces/movie';
 import { Observable } from 'rxjs';
 
@@ -15,16 +13,17 @@ import { Observable } from 'rxjs';
 export class MoviesComponent implements OnInit {
     movies_list: Movie[] = [];
     page: number = 1;
-    maxPage: number = 0;
+    maxPage: number = 1;
     myControl = new FormControl();
     filteredOptions$?: Observable<any>;
     options: string[] = [];
-    searchNameTerm?: string;
-    searchEvent: EventEmitter<string> = new EventEmitter();
+    genre?: string;
+    language?: string;
+    director?: string;
+    year?: number;
 
     constructor(
         private webService: WebService,
-        public filterDialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -63,7 +62,7 @@ export class MoviesComponent implements OnInit {
         return movie && movie.original_title ? movie.original_title : '';
     }
 
-    fetchMovieList(page: number): void {
+    fetchMovieList(page: number,): void {
         this.webService
             .getMovies(page)
             .subscribe((data: any) => {
@@ -71,20 +70,29 @@ export class MoviesComponent implements OnInit {
             });
     }
 
-    openFilterDialog(): void {
-        const dialogRef = this.filterDialog.open(FilterDialogComponent, {
-            width: '600px',
-            data: { searchNameTerm: this.searchNameTerm }
-        });
+    handleParams(): string[]{
+        const params: any = {}
+        if(this.myControl.value){
+            params['original_title'] = this.myControl.value;
+        }
+        if(this.genre){
+            params['genre'] = this.genre;
+        }
+        if(this.language){
+            params['language'] = this.language;
+        }
+        if(this.year){
+            params['year'] = this.year;
+        }
+        return params;
+    }
 
-        dialogRef.afterClosed().subscribe(result => {
-            this.searchNameTerm = result;
-        });
+    expandFilterOptions(): void {
     }
 
     onSubmitClick(): void {
         if (this.myControl.value) {
-            this.webService.getMoviesByFilters(this.myControl.value)
+            this.webService.getMoviesByFilters(this.myControl.value, this.page)
                 .subscribe((data: any) => {
                     this.movies_list = data;
                 });
