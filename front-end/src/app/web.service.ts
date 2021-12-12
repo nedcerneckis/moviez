@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class WebService {
@@ -10,10 +10,11 @@ export class WebService {
     api_path: string = '/api/v1.0';
     api_full_url: string = this.api_hostname + this.api_port + this.api_path;
 
+    moviesFiltersSearchResults = new Subject();
+
     constructor(
         public http: HttpClient
     ) { }
-
 
     getMovies(page: number): Observable<any> {
         return this.http.get(this.api_full_url + '/movies?pn=' + page);
@@ -24,6 +25,14 @@ export class WebService {
             'original_title=' + searchTerm + 
             '&pn=' + page
         );
+    }
+
+    passMoviesByFilters(results: any): void {
+        this.moviesFiltersSearchResults.next(results);
+    }
+
+    getPassedMoviesResults(): Observable<any> {
+        return this.moviesFiltersSearchResults.asObservable();
     }
 
     getAllMovieTitles(): Observable<any> {

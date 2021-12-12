@@ -170,14 +170,27 @@ def show_movies_by_name():
             skip,
             limit
         ]
+        aggregationCount = [
+            match,
+            {
+                "$count": "totalCount"
+            }
+        ]
         movies_to_return = []
         for movie in movies.aggregate(aggregation):
             movie['_id'] = str(movie['_id'])
+
             for review in movie['reviews']:
                 review['_id'] = str(review['_id'])
             movies_to_return.append(movie)
+        totalCount = {}
+        for movie in movies.aggregate(aggregationCount):
+            totalCount = movie
+        moviesAndTotalCount = {}
+        moviesAndTotalCount['value'] = movies_to_return
+        moviesAndTotalCount['totalCount'] = totalCount['totalCount']
 
-        return http_response_json(movies_to_return, 200)
+        return http_response_json(moviesAndTotalCount, 200)
 
 @app.route(URL_PREFIX + "/movies/<string:id>", methods=["GET"])
 def show_one_movie(id):

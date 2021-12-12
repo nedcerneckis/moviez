@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['./movies.component.css']
 })
 export class MoviesComponent implements OnInit {
-    movies_list: Movie[] = [];
+    movies_list?: Movie[];
     page: number = 1;
     maxPage: number = 1;
     myControl = new FormControl();
@@ -31,11 +31,12 @@ export class MoviesComponent implements OnInit {
             this.page = Number(sessionStorage['page']);
         }
 
-        this.fetchMovieList(this.page);
+        this.webService.getPassedMoviesResults()
+            .subscribe((data: any) => {
+                this.movies_list = data.results;
+                this.maxPage = Math.ceil(data.count / 12);
+            });
 
-        this.webService.getMaxPage().subscribe((data: any) => {
-            this.maxPage = data['max_page'];
-        });
         this.filteredOptions$ = this.myControl.valueChanges.pipe(
             startWith(''),
             map((value: any) => {
@@ -62,40 +63,25 @@ export class MoviesComponent implements OnInit {
         return movie && movie.original_title ? movie.original_title : '';
     }
 
-    fetchMovieList(page: number,): void {
-        this.webService
-            .getMovies(page)
-            .subscribe((data: any) => {
-                this.movies_list = data;
-            });
-    }
-
-    handleParams(): string[]{
-        const params: any = {}
+    fetchMovieList(page: number): void {
         if(this.myControl.value){
-            params['original_title'] = this.myControl.value;
-        }
-        if(this.genre){
-            params['genre'] = this.genre;
-        }
-        if(this.language){
-            params['language'] = this.language;
-        }
-        if(this.year){
-            params['year'] = this.year;
-        }
-        return params;
-    }
-
-    expandFilterOptions(): void {
-    }
-
-    onSubmitClick(): void {
-        if (this.myControl.value) {
-            this.webService.getMoviesByFilters(this.myControl.value, this.page)
+            this.webService.getMoviesByFilters(this.myControl.value, page)
                 .subscribe((data: any) => {
-                    this.movies_list = data;
+                    this.webService.passMoviesByFilters({ results: data.value, count: data.totalCount })
                 });
         }
+    }
+
+    searchMovies(): void {
+        let value = this.myControl.value;
+        if(typeof value === 'object') value = value['original_title']; 
+        console.log(`${this.language} ${this.director} ${this.year} ${this.genre} `);
+        console.log(value);
+        if(value){
+            this.webService.getMoviesByFilters(value, this.page)
+                .subscribe((data: any) => {
+                    this.webService.passMoviesByFilters({ results: data.value, count: data.totalCount })
+                });
+        }    
     }
 }

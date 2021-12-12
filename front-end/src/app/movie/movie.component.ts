@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['./movie.component.css']
 })
 export class MovieComponent implements OnInit {
-    movie_poster$?: Observable<any>;
+    movie_poster: any;
     reviews_list?: Review[];
     page: number = 1;
     maxPage: number = 1;
@@ -25,8 +25,10 @@ export class MovieComponent implements OnInit {
         this.movie_list$ = this.webService
             .getSpecificMovie(this.route.snapshot.params['id']);
 
-        this.movie_poster$ = this.webService
-            .getImagePoster(this.route.snapshot.params['id']);
+        this.webService.getImagePoster(this.route.snapshot.params['id'])
+            .subscribe((data: any) => {
+                this.movie_poster = data[0]['url'];
+            });
 
         this.fetchReviewList(this.page);
 

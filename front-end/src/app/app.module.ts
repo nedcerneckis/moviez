@@ -23,8 +23,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { PaginationComponent } from './pagination/pagination.component';
-import { MoviesSearchComponent } from './movies-search/movies-search.component';
-import { MatExpansionModule } from '@angular/material/expansion'
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const routes: any = [
   {
@@ -39,10 +39,6 @@ const routes: any = [
     path: 'movies/:id',
     component: MovieComponent
   },
-  {
-    path: 'search',
-    component: MoviesSearchComponent
-  }
 ];
 
 @NgModule({
@@ -52,8 +48,7 @@ const routes: any = [
     HomeComponent,
     MoviesComponent,
     MovieComponent,
-    PaginationComponent,
-    MoviesSearchComponent
+    PaginationComponent
   ],
   imports: [
     BrowserModule,
@@ -77,7 +72,8 @@ const routes: any = [
     MatDividerModule,
     MatSelectModule,
     MatExpansionModule,
-    FormsModule
+    FormsModule,
+    MatProgressSpinnerModule
   ],
   providers: [WebService],
   bootstrap: [AppComponent]
