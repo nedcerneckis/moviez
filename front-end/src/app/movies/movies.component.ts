@@ -27,10 +27,6 @@ export class MoviesComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        if (sessionStorage['page']) {
-            this.page = Number(sessionStorage['page']);
-        }
-
         this.webService.getPassedMoviesResults()
             .subscribe((data: any) => {
                 this.movies_list = data.results;
@@ -40,10 +36,12 @@ export class MoviesComponent implements OnInit {
         this.filteredOptions$ = this.myControl.valueChanges.pipe(
             startWith(''),
             map((value: any) => {
-                return typeof value === 'string' && value.length > 3 ? value : value.original_title
+                return typeof value === 'string' && value.length > 3 ? 
+                value : value.original_title
             }),
             map((original_title: any) => {
-                return original_title ? this.filterLowerCase(original_title) : this.options.slice(0, 0)
+                return original_title ? 
+                this.filterLowerCase(original_title) : this.options.slice(0, 0)
             }),
         );
         this.webService.getAllMovieTitles().subscribe((data: any) => {
@@ -63,24 +61,63 @@ export class MoviesComponent implements OnInit {
         return movie && movie.original_title ? movie.original_title : '';
     }
 
+    public calculateRating(movie: Movie): string {
+        let positive_count = 0
+        let review_count = 0
+        movie['reviews'].forEach(review => { 
+            if(review['sentiment'] === 'positive') positive_count++;
+            review_count++;
+        });
+        const rating = positive_count / review_count * 10;
+        return rating.toFixed(1);
+    }
+    
+
     fetchMovieList(page: number): void {
-        if(this.myControl.value){
-            this.webService.getMoviesByFilters(this.myControl.value, page)
+        if(this.myControl.value || 
+            this.genre || 
+            this.language || 
+            this.director || 
+            this.year
+        ){
+            const filters = {
+                "original_title": this.myControl.value,
+                "genre": this.genre,
+                "language": this.language,
+                "director": this.director,
+                "year": this.year
+            }
+            this.webService.getMoviesByFilters(filters, page)
                 .subscribe((data: any) => {
-                    this.webService.passMoviesByFilters({ results: data.value, count: data.totalCount })
+                    this.webService.passMoviesByFilters({ 
+                        results: data.value, count: data.totalCount 
+                    })
                 });
         }
     }
 
     searchMovies(): void {
         let value = this.myControl.value;
-        if(typeof value === 'object') value = value['original_title']; 
-        console.log(`${this.language} ${this.director} ${this.year} ${this.genre} `);
-        console.log(value);
-        if(value){
-            this.webService.getMoviesByFilters(value, this.page)
+        if(typeof value === 'object' && value !== null) value = value['original_title']; 
+        if(value ||
+            this.genre || 
+            this.language || 
+            this.director || 
+            this.year
+        ){
+            const filters = {
+                "original_title": value,
+                "genre": this.genre,
+                "language": this.language,
+                "director": this.director,
+                "year": this.year
+            }
+            this.webService.getMoviesByFilters(filters, this.page)
                 .subscribe((data: any) => {
-                    this.webService.passMoviesByFilters({ results: data.value, count: data.totalCount })
+                    console.log(data)
+                    this.webService.passMoviesByFilters({ 
+                        results: data.value, count: data.totalCount 
+                    })
                 });
         }    
     }

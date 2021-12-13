@@ -130,7 +130,7 @@ def show_movies_by_name():
         page_start = get_page_start(request)
         original_title = request.args.get("original_title")
         genre = request.args.get("genre")
-        year = request.args.get("year")
+        year = request.args.get("year", type=int)
         director = request.args.get("director")
         language = request.args.get("language")
         match = {
@@ -139,7 +139,7 @@ def show_movies_by_name():
         }
         if(original_title):
             match["$match"]["original_title"] = {
-                "$regex": original_title,
+                "$regex": str(original_title),
                 "$options": "i"
             }
         if(genre):
@@ -158,7 +158,7 @@ def show_movies_by_name():
                 "$options": "i"
             }
         if(year):
-            match["$match"]["year"] = int(year)
+            match["$match"]["year"] = year
         skip = {
             "$skip": page_start
         }
@@ -177,6 +177,7 @@ def show_movies_by_name():
             }
         ]
         movies_to_return = []
+        moviesAndTotalCount = {}
         for movie in movies.aggregate(aggregation):
             movie['_id'] = str(movie['_id'])
 
@@ -186,11 +187,14 @@ def show_movies_by_name():
         totalCount = {}
         for movie in movies.aggregate(aggregationCount):
             totalCount = movie
-        moviesAndTotalCount = {}
-        moviesAndTotalCount['value'] = movies_to_return
-        moviesAndTotalCount['totalCount'] = totalCount['totalCount']
-
-        return http_response_json(moviesAndTotalCount, 200)
+        if(movies_to_return == []):
+            moviesAndTotalCount['value'] = movies_to_return
+            moviesAndTotalCount['totalCount'] = 0
+            return http_response_json(moviesAndTotalCount, 204)
+        else:
+            moviesAndTotalCount['value'] = movies_to_return
+            moviesAndTotalCount['totalCount'] = totalCount['totalCount']
+            return http_response_json(moviesAndTotalCount, 200)
 
 @app.route(URL_PREFIX + "/movies/<string:id>", methods=["GET"])
 def show_one_movie(id):
@@ -332,97 +336,6 @@ def get_movie_reviews(id):
             return error_response("Movie not found", 404)
     else:
         return error_response("Invalid movie ID", 404)
-
-
-"""
-@app.route(URL_PREFIX + '/names', methods=["GET"])
-def show_all_names():
-    page_size = get_page_size(request)
-    page_start = get_page_start(request)
-
-    names_list = []
-    for person in names.find().skip(page_start).limit(page_size):
-        person['_id'] = str(person['_id'])
-        for film in person['filmography']:
-            film['_id'] = str(film['_id'])
-        names_list.append(person)
-
-    return http_response_json(names_list, 200)
-
-@app.route(URL_PREFIX + "/names/<string:id>", methods=["GET"])
-def show_one_name(id):
-    if id_is_valid(id):
-        person = names.find_one({'_id':ObjectId(id)})
-        name = []
-        if person is not None:
-            person['_id'] = str(person['_id'])
-            for film in person['filmography']:
-                film['_id'] = str(film['_id'])
-            
-            name.append(person)
-            return http_response_json(name, 200)
-        else:
-            return error_response("Name not found", 404)
-    else:
-        return error_response("Invalid name ID", 404)
-
-@app.route(URL_PREFIX + "/names", methods=["POST"])
-def add_name():
-    if form_data_is_invalid(names_required_fields):
-        return error_response("Form data is invalid", 404)
-    new_name = {}
-    for field in names_required_fields:
-        new_name[field] = request.form[field]
-    new_name["filmography"] = []
-    new_name_id = names.insert_one(new_name)
-    new_name_link = API_HOSTNAME + API_PORT + URL_PREFIX + "/names/" \
-        + str(new_name_id.inserted_id)
-
-    return make_response( jsonify( {"url": new_name_link} ), 201)
-
-@app.route(URL_PREFIX + "/names/<string:id>", methods=["PUT"])
-def edit_name(id):
-    if id_is_valid(id):
-        if form_data_is_invalid(names_required_fields):
-            return error_response("Missing form data", 404)
-        else:
-            result = names.update_one(
-                {
-                    "_id" : ObjectId(id)
-                },
-                {
-                    "$set" : {
-                        "name": request.form["name"],
-                        "bio": request.form["bio"],
-                        "date_of_birth": request.form["date_of_birth"],
-                        "place_of_birth": request.form["place_of_birth"],
-                        "date_of_death": request.form["date_of_death"]
-
-                    }
-                }
-            )
-            if result.matched_count == 1:
-                edited_name_link = API_HOSTNAME + API_PORT + URL_PREFIX + "/names/" + id
-                return http_response("url", edited_name_link, 200)
-            else:
-                return error_response("Name not found", 404)
-
-    else:
-        return error_response("Invalid name ID", 404)
-
-@app.route(URL_PREFIX + "/names/<string:id>", methods=["DELETE"])
-def delete_name(id):
-    if id_is_valid(id):
-        delete_result = names.delete_one({
-            "_id" : ObjectId(id)
-        })
-        if delete_result.deleted_count == 1:
-            return http_response_json({}, 204)
-        else:
-            return error_response("Name not found", 404)
-    else:
-        return error_response("Invalid name ID", 404)
-"""
 
 if __name__ == "__main__":
     app.run(debug=False)

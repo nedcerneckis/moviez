@@ -4,7 +4,7 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Filters
+                    Advanced Search
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
@@ -83,8 +83,9 @@
                 <mat-card-subtitle>{{ movie.year }}</mat-card-subtitle>
                 <mat-card-subtitle>{{ movie.production_company }}</mat-card-subtitle>
                 <p><i>{{ movie.genre }}</i></p>
-                <p class="rating-num" *ngFor="">
+                <p class="rating-num" >
                     <mat-icon class="stars-icon">stars</mat-icon>
+                    {{ calculateRating(movie) }}
                 </p>
                 <p></p>
                 <mat-card-content>

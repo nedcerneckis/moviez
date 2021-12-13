@@ -22,6 +22,10 @@ export class MovieComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        if (sessionStorage['page']) {
+            this.page = Number(sessionStorage['page']);
+        }
+
         this.movie_list$ = this.webService
             .getSpecificMovie(this.route.snapshot.params['id']);
 

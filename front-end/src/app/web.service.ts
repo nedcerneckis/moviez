@@ -20,10 +20,21 @@ export class WebService {
         return this.http.get(this.api_full_url + '/movies?pn=' + page);
     }
 
-    getMoviesByFilters(searchTerm: string, page: number): Observable<any> {
+    getMoviesByFilters(filters: any, page: number): Observable<any> {
+        let filter_string = ''
+        for (const filter in filters){
+            if(filters[filter] !== undefined && 
+                filters[filter] !== null &&
+                filters[filter] !== ''
+            ){
+                filter_string = filter_string + filter + '=' + filters[filter] + '&'
+            }
+        }
+        if(page){
+            filter_string = filter_string + 'pn=' + page.toString();
+        }
         return this.http.get(this.api_full_url + '/movies/search?' + 
-            'original_title=' + searchTerm + 
-            '&pn=' + page
+            filter_string
         );
     }
 
