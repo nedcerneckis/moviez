@@ -27,6 +27,20 @@ export class MoviesComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        /*
+        if(sessionStorage['page'] && sessionStorage['filters']){
+            const page = sessionStorage['page'];
+            const filters = JSON.parse(sessionStorage['filters']);
+            this.page = page;
+            this.webService.getMoviesByFilters(filters, page)
+                .subscribe((data: any) => {
+                    this.webService.passMoviesByFilters({ 
+                        results: data.value, count: data.totalCount 
+                    });
+                });
+        }
+        */
+
         this.webService.getPassedMoviesResults()
             .subscribe((data: any) => {
                 this.movies_list = data.results;
@@ -71,32 +85,8 @@ export class MoviesComponent implements OnInit {
         const rating = positive_count / review_count * 10;
         return rating.toFixed(1);
     }
-    
 
-    fetchMovieList(page: number): void {
-        if(this.myControl.value || 
-            this.genre || 
-            this.language || 
-            this.director || 
-            this.year
-        ){
-            const filters = {
-                "original_title": this.myControl.value,
-                "genre": this.genre,
-                "language": this.language,
-                "director": this.director,
-                "year": this.year
-            }
-            this.webService.getMoviesByFilters(filters, page)
-                .subscribe((data: any) => {
-                    this.webService.passMoviesByFilters({ 
-                        results: data.value, count: data.totalCount 
-                    })
-                });
-        }
-    }
-
-    searchMovies(): void {
+    fetchMoviesWithFilters(page: number): void {
         let value = this.myControl.value;
         if(typeof value === 'object' && value !== null) value = value['original_title']; 
         if(value ||
@@ -112,13 +102,22 @@ export class MoviesComponent implements OnInit {
                 "director": this.director,
                 "year": this.year
             }
-            this.webService.getMoviesByFilters(filters, this.page)
+            this.webService.getMoviesByFilters(filters, page)
                 .subscribe((data: any) => {
-                    console.log(data)
                     this.webService.passMoviesByFilters({ 
                         results: data.value, count: data.totalCount 
-                    })
+                    });
+                    sessionStorage['filters'] = JSON.stringify(filters);
+                    sessionStorage['page'] = page
                 });
         }    
+    }
+
+    fetchMovieList(page: number): void {
+        this.fetchMoviesWithFilters(page);
+    }
+
+    searchMovies(): void {
+        this.fetchMoviesWithFilters(this.page);
     }
 }

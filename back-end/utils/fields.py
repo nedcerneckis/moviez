@@ -11,4 +11,4 @@ movies_required_fields = [movie for movie in movies.find_one(
     }
 )]
 
-reviews_required_fields = ['username', 'review', 'sentiment']
+reviews_required_fields = ['review', 'sentiment']

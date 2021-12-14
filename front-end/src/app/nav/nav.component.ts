@@ -18,4 +18,10 @@ export class NavComponent implements OnInit {
             this.profileJson = JSON.stringify(profile, null, 2);
         });
     }
+
+    clearSessionStorage(): void {
+        if(sessionStorage['filters'] && sessionStorage['page']){
+            sessionStorage.clear();
+        }
+    }
 }

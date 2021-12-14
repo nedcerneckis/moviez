@@ -1,5 +1,13 @@
 <mat-spinner *ngIf="!(movie_poster && reviews_list)"></mat-spinner>
 <div *ngIf="movie_poster && reviews_list">
+    <button class="back-button" 
+    mat-raised-button 
+    type="submit" 
+    color="primary"
+    (click)="onBackButtonClick()"
+    >
+        Go back
+    </button>
     <mat-card class="movie-card">
         <div class="movie-poster">
             <img class="movie_image" src={{movie_poster}}>
@@ -30,6 +38,23 @@
     <div class="review-card" *ngFor="let single_review of reviews_list">
         <mat-card class="movie-card">
             <div class="content">
+                <div class="edit-delete-buttons">
+                    <button 
+                    mat-mini-fab 
+                    type="submit" 
+                    color="primary"
+                    >
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button 
+                    mat-mini-fab 
+                    type="submit" 
+                    color="warn"
+                    (click)="onReviewDelete(single_review._id)"
+                    >
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
                 <mat-card-title>
                     <mat-card-subtitle>
                         <i>{{ single_review.username }}</i>
@@ -51,10 +76,59 @@
             </div>
         </mat-card>
     </div>
+    <mat-card>
+        <form 
+        [formGroup]="reviewForm" 
+        class="comment-card"
+        (ngSubmit)="onSubmit()"
+        >
+            <mat-card-title>
+                <h2><i>Leave a review!</i></h2>
+            </mat-card-title>
+
+            <mat-form-field class="comment-post" appearance="fill"
+            >
+                <mat-label>Sentiment</mat-label>
+                <mat-select 
+                matNativeControl 
+                required
+                id="sentiment"
+                formControlName="sentiment"
+                >
+                    <mat-option value="positive">Positive</mat-option>
+                    <mat-option value="negative">Negative</mat-option>
+                </mat-select>
+                <mat-error *ngIf="reviewForm.get('sentiment').touched">
+                    Please pick a sentiment.
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="comment-post" appearance="fill">
+                <mat-label>Leave a comment</mat-label>
+                <textarea
+                required
+                matInput 
+                formControlName="review" 
+                placeholder="I find this movie...">
+                </textarea>
+                <mat-error *ngIf="reviewForm.get('review').touched">
+                    Please enter a comment.
+                </mat-error>
+            </mat-form-field>
+            <button 
+            mat-raised-button 
+            [disabled]="!reviewForm.valid" 
+            type="submit" 
+            color="primary"
+            >
+                Submit
+            </button>
+        </form>
+    </mat-card>
 </div>
 <app-pagination
-    *ngIf="reviews_list && movie_poster"
-    [maxPage]="maxPage"
-    [page]="page"
-    (updateItemsList)="fetchReviewList($event)"
+*ngIf="reviews_list && movie_poster"
+[maxPage]="maxPage"
+[page]="page"
+(updateItemsList)="fetchReviewList($event)"
 >

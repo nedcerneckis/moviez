@@ -73,7 +73,8 @@ const routes: any = [
     MatSelectModule,
     MatExpansionModule,
     FormsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ReactiveFormsModule
   ],
   providers: [WebService],
   bootstrap: [AppComponent]

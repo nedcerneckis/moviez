@@ -5,7 +5,7 @@
     </span>
 
     <a routerLink="/" mat-button aria-label="Home">My Profile</a>
-    <a routerLink="/movies" mat-button aria-label="Movies">Movies</a>
+    <a routerLink="/movies" (click)="clearSessionStorage()" mat-button aria-label="Movies">Movies</a>
     <span class="spacer"></span>
 
     <span class="spacer"></span>

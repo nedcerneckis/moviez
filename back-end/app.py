@@ -15,8 +15,7 @@ from utils.config import (
     API_HOSTNAME,
     API_PORT,
     URL_PREFIX, 
-    movies, 
-    names
+    movies
 )
 from utils.fields import ( 
     reviews_required_fields,
@@ -139,7 +138,7 @@ def show_movies_by_name():
         }
         if(original_title):
             match["$match"]["original_title"] = {
-                "$regex": str(original_title),
+                "$regex": original_title,
                 "$options": "i"
             }
         if(genre):
@@ -268,7 +267,7 @@ def edit_movie(id):
 @app.route(URL_PREFIX + "/movies/<string:id>", methods=["DELETE"])
 def delete_movie(id):
     if id_is_valid(id):
-        delete_result = names.delete_one({
+        delete_result = movies.delete_one({
             "_id" : ObjectId(id)
         })
         if delete_result.deleted_count == 1:
@@ -288,7 +287,6 @@ def add_movie_review(id):
             else:
                 new_review = {
                     '_id': ObjectId(),
-                    'username': request.form['username'],
                     'review': request.form['review'],
                     'sentiment': request.form['sentiment']
                 }
@@ -336,6 +334,25 @@ def get_movie_reviews(id):
             return error_response("Movie not found", 404)
     else:
         return error_response("Invalid movie ID", 404)
+
+@app.route(URL_PREFIX + "/movies/<string:id>/reviews/<string:r_id>", methods=["DELETE"])
+def delete_review(id, r_id):
+    if id_is_valid(id) and id_is_valid(r_id):
+        movies.update_one(
+            {
+                "_id" : ObjectId(id)
+            },
+            {
+                "$pull" : {
+                    "reviews" : { 
+                        "_id" : ObjectId(r_id) 
+                    }
+                }
+            }
+        )
+        return http_response_json({}, 204)
+    else:
+        error_response("MovieID or ReviewID is invalid", 404)
 
 if __name__ == "__main__":
     app.run(debug=False)

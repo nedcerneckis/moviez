@@ -14,10 +14,18 @@ export class PaginationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        /*
+        if(sessionStorage['page']){
+            this.page = sessionStorage['page'];
+        }
+        */
+    }
+
+    ngOnChanges(changes: any): void {
+        console.log(changes);
     }
 
     updatePagination(): void {
-        sessionStorage['page'] = this.page;
         this.updateItemsList.emit(this.page)
     }
 

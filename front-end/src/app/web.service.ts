@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AuthService } from '@auth0/auth0-angular';
 import { Observable, Subject } from 'rxjs';
+import { Review } from './interfaces/review';
 
 @Injectable()
 export class WebService {
@@ -9,16 +11,14 @@ export class WebService {
     api_port: string = ':5000';
     api_path: string = '/api/v1.0';
     api_full_url: string = this.api_hostname + this.api_port + this.api_path;
+    user: any;
+    private movieId: string = '';
 
     moviesFiltersSearchResults = new Subject();
 
     constructor(
-        public http: HttpClient
+        public http: HttpClient,
     ) { }
-
-    getMovies(page: number): Observable<any> {
-        return this.http.get(this.api_full_url + '/movies?pn=' + page);
-    }
 
     getMoviesByFilters(filters: any, page: number): Observable<any> {
         let filter_string = ''
@@ -51,6 +51,7 @@ export class WebService {
     }
 
     getSpecificMovie(id: string): Observable<any> {
+        this.movieId = id;
         return this.http.get(this.api_full_url + '/movies/' + id);
     }
 
@@ -67,14 +68,20 @@ export class WebService {
     }
 
     getReviewMaxPage(id: string): Observable<any> {
-        return this.http.get(this.api_full_url + '/movies/' + id + '/reviews/maxpage');
+        return this.http.get(this.api_full_url + 
+            '/movies/' + id + 
+            '/reviews/maxpage'
+        );
     }
 
     getReviews(id: string, page: number): Observable<any> {
-        return this.http.get(this.api_full_url + '/movies/' + id + '/reviews?pn=' + page);
+        return this.http.get(this.api_full_url + 
+            '/movies/' + id + 
+            '/reviews?pn=' + page
+        );
     }
 
-    addMovie() {
+    postMovie() {
     }
 
     updateMovie() {
@@ -82,5 +89,27 @@ export class WebService {
 
     deleteMovie() {
 
+    }
+
+    postReview(review: Review) {
+        const postReviewData = new FormData();
+        postReviewData.append('sentiment', review.sentiment);
+        postReviewData.append('review', review.review);
+
+        return this.http.post(this.api_full_url + 
+            '/movies/' + this.movieId + '/reviews', 
+            postReviewData
+        );
+    }
+
+    updateReview() {
+
+    }
+
+    deleteReview(id: string) {
+        return this.http.delete(this.api_full_url +
+            '/movies/' + this.movieId + 
+            '/reviews/' + id
+        );
     }
 }
