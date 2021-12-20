@@ -5,6 +5,9 @@ import { Review } from '../interfaces/review';
 import { Observable } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { EditReviewComponent } from './edit-review/edit-review.component';
+import { Movie } from '../interfaces/movie';
 
 @Component({
     selector: 'app-movie',
@@ -16,30 +19,31 @@ export class MovieComponent implements OnInit {
     reviews_list?: Review[];
     page: number = 1;
     maxPage: number = 1;
-    movie_list$?: Observable<any>;
     reviewForm: any;
+    movie!: Movie;
 
     constructor(
         private webService: WebService,
         private route: ActivatedRoute,
         private formBuilder: FormBuilder,
-        private location: Location
+        private location: Location,
+        public reviewDialog: MatDialog
     ){ }
 
     ngOnInit(): void {
-        /*
         if (sessionStorage['page']) {
             this.page = Number(sessionStorage['page']);
         }
-        */
 
         this.reviewForm = this.formBuilder.group({
             review: ['', Validators.required],
             sentiment: ['', Validators.required]
         })
 
-        this.movie_list$ = this.webService
-            .getSpecificMovie(this.route.snapshot.params['id']);
+        this.webService.getSpecificMovie(this.route.snapshot.params['id'])
+            .subscribe(data => {
+                this.movie = data[0];
+            });
 
         this.webService.getImagePoster(this.route.snapshot.params['id'])
             .subscribe((data: any) => {
@@ -54,16 +58,19 @@ export class MovieComponent implements OnInit {
             });
     }
 
-    ngOnChanges(): void {
-        console.log('stuff chaanged')
-    }
-
-    ngOnDestroy(): void {
-        console.log('stuff destroyed')
-    }
-
     onBackButtonClick(){
         this.location.back();
+    }
+
+    openReviewEditDialog(review: Review): void {
+        const dialogRef = this.reviewDialog.open(EditReviewComponent, {
+            width: '50em',
+            height: '30em',
+            data: review
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            this.fetchReviewList(this.page);
+        });
     }
 
     onReviewDelete(id: string): void {
@@ -73,11 +80,14 @@ export class MovieComponent implements OnInit {
 
     onSubmit(): void {
         this.webService.postReview(this.reviewForm.value)
-            .subscribe((data: any) => {
+            .subscribe(() => {
                 this.fetchReviewList(this.page);
-                console.log('posted review')
             });
         this.reviewForm.reset();
+        Object.keys(this.reviewForm.controls).forEach(key => {
+            this.reviewForm.controls[key].setErrors(null);
+        });
+
     }
 
     fetchReviewList(page: number): void {

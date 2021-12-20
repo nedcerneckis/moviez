@@ -74,7 +74,7 @@
     </div>
     
 </form>
-<h1 *ngIf="!movies_list">Search Moviez!</h1>
+<h1 *ngIf="noResultsFound">No Results Found!</h1>
 <mat-grid-list cols="4" rows>
     <div *ngFor="let movie of movies_list">
         <mat-grid-tile>

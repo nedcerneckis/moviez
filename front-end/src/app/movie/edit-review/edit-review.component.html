@@ -1,0 +1,35 @@
+<form mat-dialog-content [formGroup]="editReviewForm" (ngSubmit)="onSubmitClick()">
+
+    <h1 mat-dialog-title>Edit review details</h1>
+
+    <mat-form-field>
+        <mat-label>Sentiment</mat-label>
+        <mat-select matNativeControl required id="sentiment" formControlName="sentiment">
+            <mat-option value="positive">Positive</mat-option>
+            <mat-option value="negative">Negative</mat-option>
+        </mat-select>
+        <mat-error *ngIf="editReviewForm.get('sentiment').touched">
+            Please pick a sentiment.
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="comment-post" appearance="fill">
+        <mat-label>Leave a comment</mat-label>
+        <textarea required matInput formControlName="review" rows="8">
+        </textarea>
+        <mat-error *ngIf="editReviewForm.get('review').touched">
+            Please enter a comment.
+        </mat-error>
+    </mat-form-field>
+
+    <div mat-dialog-actions>
+        <button mat-button (click)="onBackClick()">Back</button>
+        <button 
+        mat-raised-button 
+        [disabled]="!editReviewForm.valid" 
+        type="submit" 
+        color="primary">
+            Confirm
+        </button>
+    </div>
+</form>

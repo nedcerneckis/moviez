@@ -12,7 +12,7 @@
         <div class="movie-poster">
             <img class="movie_image" src={{movie_poster}}>
         </div>
-        <div class="content" *ngFor="let movie of movie_list$ | async">
+        <div class="content">
             <mat-card-title>
                 {{ movie.original_title }}
                 <mat-card-subtitle>{{ movie.year }}</mat-card-subtitle>
@@ -43,6 +43,7 @@
                     mat-mini-fab 
                     type="submit" 
                     color="primary"
+                    (click)="openReviewEditDialog(single_review)"
                     >
                         <mat-icon>edit</mat-icon>
                     </button>
@@ -86,8 +87,7 @@
                 <h2><i>Leave a review!</i></h2>
             </mat-card-title>
 
-            <mat-form-field class="comment-post" appearance="fill"
-            >
+            <mat-form-field class="comment-post" appearance="fill">
                 <mat-label>Sentiment</mat-label>
                 <mat-select 
                 matNativeControl 

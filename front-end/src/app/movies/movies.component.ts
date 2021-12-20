@@ -21,13 +21,13 @@ export class MoviesComponent implements OnInit {
     language?: string;
     director?: string;
     year?: number;
+    noResultsFound?: boolean;
 
     constructor(
         private webService: WebService,
     ) { }
 
     ngOnInit(): void {
-        /*
         if(sessionStorage['page'] && sessionStorage['filters']){
             const page = sessionStorage['page'];
             const filters = JSON.parse(sessionStorage['filters']);
@@ -39,7 +39,6 @@ export class MoviesComponent implements OnInit {
                     });
                 });
         }
-        */
 
         this.webService.getPassedMoviesResults()
             .subscribe((data: any) => {
@@ -104,11 +103,17 @@ export class MoviesComponent implements OnInit {
             }
             this.webService.getMoviesByFilters(filters, page)
                 .subscribe((data: any) => {
-                    this.webService.passMoviesByFilters({ 
-                        results: data.value, count: data.totalCount 
-                    });
-                    sessionStorage['filters'] = JSON.stringify(filters);
-                    sessionStorage['page'] = page
+                    if(data){
+                        this.webService.passMoviesByFilters({ 
+                            results: data.value, count: data.totalCount 
+                        });
+                        sessionStorage['filters'] = JSON.stringify(filters);
+                        sessionStorage['page'] = page
+                        this.noResultsFound = false;
+                    } else {
+                        this.noResultsFound = true;
+                        this.movies_list = [];
+                    }
                 });
         }    
     }

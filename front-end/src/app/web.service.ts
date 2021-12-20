@@ -15,6 +15,7 @@ export class WebService {
     private movieId: string = '';
 
     moviesFiltersSearchResults = new Subject();
+    reviewsResults = new Subject();
 
     constructor(
         public http: HttpClient,
@@ -81,6 +82,14 @@ export class WebService {
         );
     }
 
+    passReviewsResults(results: any): void {
+        this.reviewsResults.next(results);
+    }
+
+    getPassedReviewsResults(): Observable<any> {
+        return this.reviewsResults.asObservable();
+    }
+
     postMovie() {
     }
 
@@ -102,8 +111,15 @@ export class WebService {
         );
     }
 
-    updateReview() {
+    updateReview(id: string, review: Review) {
+        const updateReviewData = new FormData();
+        updateReviewData.append('sentiment', review.sentiment);
+        updateReviewData.append('review', review.review);
 
+        return this.http.put(this.api_full_url + 
+            '/movies/' + this.movieId + '/reviews/' + id,
+            updateReviewData
+        );
     }
 
     deleteReview(id: string) {

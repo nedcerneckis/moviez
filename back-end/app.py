@@ -3,10 +3,13 @@ from flask_cors import CORS
 from functools import wraps
 from bson import ObjectId
 from bs4 import BeautifulSoup
+from jwt.jwt import JWT
 import requests
 import json
 import re
 import math
+import jwt
+import datetime
 
 from utils.http_response import error_response, http_response_json, http_response
 from utils.pagination import get_page_size, get_page_start, get_review_page_size, get_review_page_start
@@ -23,11 +26,25 @@ from utils.fields import (
 )
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'mysecret'
 CORS(app)
 
 @app.errorhandler(404)
 def page_not_found(error):
     return error_response("Resource not found", 404)
+
+def jwt_required(func):
+    @wraps(func)
+    def jwt_required_wrapper(*args, **kwargs):
+        token = request.args.get('token')
+        if not token:
+            http_response("message", "Token is missing", 401)
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+        except:
+            return http_response("message", "Token is invalid", 401)
+        return func(*args, **kwargs)
+    return jwt_required_wrapper
 
 @app.route(URL_PREFIX + '/movies', methods=["GET"])
 def show_all_movies():
@@ -307,6 +324,7 @@ def add_movie_review(id):
             return error_response("Movie not found", 404)
     else:
         return error_response("Invalid movie ID", 404)
+        
 
 @app.route(URL_PREFIX + "/movies/<string:id>/reviews", methods=['GET'])
 def get_movie_reviews(id):
@@ -334,6 +352,27 @@ def get_movie_reviews(id):
             return error_response("Movie not found", 404)
     else:
         return error_response("Invalid movie ID", 404)
+
+@app.route(URL_PREFIX + "/movies/<string:id>/reviews/<string:r_id>", methods=["PUT"])
+def edit_review(id, r_id):
+    if id_is_valid(id) and id_is_valid(r_id):
+        edited_review = {
+            "reviews.$.sentiment" : request.form["sentiment"],
+            "reviews.$.review" : request.form["review"],
+        }
+        movies.update_one(
+            {
+                "reviews._id" : ObjectId(r_id)
+            },
+            {
+                "$set" : edited_review
+            }
+        )
+        edited_review_url = API_HOSTNAME + API_PORT + URL_PREFIX + \
+            "movies/" + id + "/reviews/" + r_id
+        return http_response("url", edited_review_url, 200)
+    else:
+        error_response("MovieID or ReviewID is invalid", 404)
 
 @app.route(URL_PREFIX + "/movies/<string:id>/reviews/<string:r_id>", methods=["DELETE"])
 def delete_review(id, r_id):

@@ -21,12 +21,14 @@ export class PaginationComponent implements OnInit {
         */
     }
 
-    ngOnChanges(changes: any): void {
-        console.log(changes);
+    updatePagination(): void {
+        /*sessionStorage['page'] = this.page;*/
+        console.log(this.page);
+        this.updateItemsList.emit(this.page)
     }
 
-    updatePagination(): void {
-        this.updateItemsList.emit(this.page)
+    ngOnDestroy(): void {
+        localStorage.clear();
     }
 
     getPageArray(): number[] {
