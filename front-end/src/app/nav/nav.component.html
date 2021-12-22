@@ -4,20 +4,19 @@
         Moviez
     </span>
 
-    <a routerLink="/" mat-button aria-label="Home">My Profile</a>
-    <a routerLink="/movies" (click)="clearSessionStorage()" mat-button aria-label="Movies">Movies</a>
+    <a routerLink="/" mat-button aria-label="My Profile">My Profile</a>
+    <a routerLink="/movies"  mat-button aria-label="Movies">Movies</a>
     <span class="spacer"></span>
 
     <span class="spacer"></span>
-    <ng-container *ngIf="authService.isAuthenticated$ | async;
+    <ng-container *ngIf="authService.loggedIn;
       else loggedOut">
-        <a mat-raised-button color="accent" (click)="authService.logout()">
+        <a mat-raised-button color="accent" (click)="onLogoutSubmit()">
             Logout
         </a>
     </ng-container>
-
     <ng-template #loggedOut>
-        <a mat-raised-button color="accent" (click)="authService.loginWithRedirect()">
+        <a routerLink="/login" mat-raised-button color="accent"> 
             Login
         </a>
     </ng-template>

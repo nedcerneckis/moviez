@@ -32,6 +32,12 @@
             </mat-card-actions>
             <mat-card-footer class="footer">
                 <p>Duration: <b>{{ (movie.duration / 60).toFixed(2) }} hours</b></p>
+                <button mat-raised-button color="primary" *ngIf="authService.loggedIn" (click)="submitFavouriteMovie(movie._id)">
+                    Favourite movie
+                </button>
+                <button mat-raised-button color="warn" *ngIf="user.admin == true" (click)="onMovieDelete(movie._id)">
+                    Delete movie
+                </button>
             </mat-card-footer>
         </div>
     </mat-card>
@@ -77,6 +83,8 @@
             </div>
         </mat-card>
     </div>
+    <ng-container *ngIf="authService.loggedIn;
+    else loggedOut">
     <mat-card>
         <form 
         [formGroup]="reviewForm" 
@@ -125,6 +133,16 @@
             </button>
         </form>
     </mat-card>
+    </ng-container>
+    <ng-template #loggedOut>
+        <mat-card>
+            <div class="comment-card">
+                <mat-card-title>
+                    <h2><i>Please login to leave a review</i></h2>
+                </mat-card-title>
+            </div>
+        </mat-card>
+    </ng-template>
 </div>
 <app-pagination
 *ngIf="reviews_list && movie_poster"

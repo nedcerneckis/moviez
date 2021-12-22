@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { WebService } from '../web.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Review } from '../interfaces/review';
 import { Observable } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
@@ -8,6 +8,7 @@ import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { EditReviewComponent } from './edit-review/edit-review.component';
 import { Movie } from '../interfaces/movie';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-movie',
@@ -21,19 +22,24 @@ export class MovieComponent implements OnInit {
     maxPage: number = 1;
     reviewForm: any;
     movie!: Movie;
+    user: any;
 
     constructor(
         private webService: WebService,
         private route: ActivatedRoute,
+        private router: Router,
         private formBuilder: FormBuilder,
         private location: Location,
-        public reviewDialog: MatDialog
+        public reviewDialog: MatDialog,
+        public authService: AuthService
     ){ }
 
     ngOnInit(): void {
         if (sessionStorage['page']) {
             this.page = Number(sessionStorage['page']);
         }
+
+        this.getUserDetails();
 
         this.reviewForm = this.formBuilder.group({
             review: ['', Validators.required],
@@ -57,6 +63,13 @@ export class MovieComponent implements OnInit {
                 this.maxPage = data['max_page'];
             });
     }
+
+    getUserDetails(): void {
+        this.authService.getUserDetails().subscribe(data => {
+            this.user = data;
+        });
+    }
+
 
     onBackButtonClick(){
         this.location.back();
@@ -88,6 +101,16 @@ export class MovieComponent implements OnInit {
             this.reviewForm.controls[key].setErrors(null);
         });
 
+    }
+
+    onMovieDelete(id: string): void {
+        this.webService.deleteMovie(id).subscribe();
+        this.router.navigate(['/movies'])
+        this.fetchReviewList(this.page); 
+    }
+
+    submitFavouriteMovie(id: string): void {
+        this.authService.addMovieFavourite(id).subscribe();
     }
 
     fetchReviewList(page: number): void {

@@ -1,10 +1,20 @@
-<ng-container *ngIf="authService.isAuthenticated$ | async;
-    else loggedOut">
-    <div *ngIf="authService.user$ | async as user">
-        <h1>Welcome {{ user.name }}</h1>
-        <h1>Your favourite movies:</h1>
-    </div>
+<ng-container *ngIf="authService.loggedIn && user;
+else loggedOut">
+    <h2>Welcome back, {{user.first_name}} {{user.surname}}!</h2>
+
+    <mat-card>
+        <h2>Your favourite movies</h2>
+        <hr>
+            <div class="movie" *ngFor="let movie of movies_list">
+                <p><b>{{ movie.original_title }}</b></p>
+                <button mat-button color="warn" (click)="onUserMovieDelete(movie._id)">
+                    Delete
+                </button>
+                <hr>
+            </div>
+    </mat-card>
 </ng-container>
 
 <ng-template #loggedOut>
+    <h2>Please login to view your profile</h2>
 </ng-template>

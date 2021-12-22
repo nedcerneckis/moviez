@@ -26,6 +26,9 @@ import { PaginationComponent } from './pagination/pagination.component';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EditReviewComponent } from './movie/edit-review/edit-review.component';
+import { LoginComponent } from './login/login.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { AuthService } from './auth.service';
 
 const routes: any = [
   {
@@ -40,6 +43,10 @@ const routes: any = [
     path: 'movies/:id',
     component: MovieComponent
   },
+  {
+    path: 'login',
+    component: LoginComponent
+  }
 ];
 
 @NgModule({
@@ -50,17 +57,14 @@ const routes: any = [
     MoviesComponent,
     MovieComponent,
     PaginationComponent,
-    EditReviewComponent
+    EditReviewComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     RouterModule.forRoot(routes),
     ReactiveFormsModule,
-    AuthModule.forRoot({
-      domain: 'dev-tk6nzgwg.us.auth0.com',
-      clientId: 'BbyBqeRxrwLJofLf6XQGWsAre0Ej6WV2'
-    }),
     BrowserAnimationsModule,
     MatToolbarModule,
     MatIconModule,
@@ -76,9 +80,10 @@ const routes: any = [
     MatExpansionModule,
     FormsModule,
     MatProgressSpinnerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTabsModule
   ],
-  providers: [WebService],
+  providers: [WebService, AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

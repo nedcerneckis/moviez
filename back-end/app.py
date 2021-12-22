@@ -1,15 +1,16 @@
+from os import error
 from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
 from functools import wraps
 from bson import ObjectId
 from bs4 import BeautifulSoup
-from jwt.jwt import JWT
 import requests
 import json
 import re
 import math
 import jwt
 import datetime
+import bcrypt
 
 from utils.http_response import error_response, http_response_json, http_response
 from utils.pagination import get_page_size, get_page_start, get_review_page_size, get_review_page_start
@@ -17,8 +18,10 @@ from utils.validation import form_data_is_invalid, id_is_valid
 from utils.config import ( 
     API_HOSTNAME,
     API_PORT,
-    URL_PREFIX, 
-    movies
+    URL_PREFIX,
+    movies,
+    users,
+    blacklist
 )
 from utils.fields import ( 
     reviews_required_fields,
@@ -29,22 +32,178 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 CORS(app)
 
-@app.errorhandler(404)
-def page_not_found(error):
-    return error_response("Resource not found", 404)
-
 def jwt_required(func):
     @wraps(func)
     def jwt_required_wrapper(*args, **kwargs):
-        token = request.args.get('token')
-        if not token:
+        token = None
+        if('x-access-token' in request.headers):
+            token = request.headers['x-access-token']
+        if(not token):
             http_response("message", "Token is missing", 401)
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         except:
             return http_response("message", "Token is invalid", 401)
+        blacklist_token = blacklist.find_one({
+            "token": token
+        })
+        if blacklist_token is not None:
+            return http_response("message", "Token has been cancelled", 401)
         return func(*args, **kwargs)
     return jwt_required_wrapper
+
+def admin_required(func):
+    @wraps(func)
+    def admin_required_wrapper(*args, **kwargs):
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+        if data["admin"]:
+            return func(*args, **kwargs)
+        else:
+            return http_response("message", "Admin access required", 401)
+    return admin_required_wrapper
+
+@app.errorhandler(404)
+def page_not_found():
+    return error_response("Resource not found", 404)
+
+@app.route(URL_PREFIX + "/login", methods=["POST"])
+def login():
+    auth = request.authorization
+
+    if auth:
+        user = users.find_one({
+            "username": auth.username
+        })
+        if user is not None:
+            if (bcrypt.checkpw(bytes(auth.password, "UTF-8"), user["password"])):
+                token = jwt.encode({
+                    "user": auth.username,
+                    "admin": user["admin"],
+                    "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+                }, app.config['SECRET_KEY'])
+                return http_response("token", token, 200)
+            else:
+                error_response("Incorrect password", 401)
+        else:
+            return error_response("Incorrect username", 401)
+    else:
+        return error_response("Authentication required", 401)
+
+@app.route(URL_PREFIX + '/login/token', methods=["POST"])
+@jwt_required
+def login_token():
+    return http_response("message", "Token is successful", 200)
+
+@app.route(URL_PREFIX + '/logout', methods=["POST"])
+def logout():
+    token = request.headers['x-access-token']
+    blacklist.insert_one({
+        "token": token
+    })
+    return http_response("message", "Logout successful", 200)
+
+@app.route(URL_PREFIX + '/register', methods=["POST"])
+def register_new_user():
+    user = request.get_json()
+    if("username" in user and
+        "password" in user and
+        "first_name" in user and
+        "surname" in user
+    ):
+        result = users.find_one({
+            "username": user["username"]
+        })
+        if(result is None):
+            users.insert_one({
+                "_id": ObjectId(),
+                "username": user["username"],
+                "password": bcrypt.hashpw(bytes(user["password"], "utf-8"), bcrypt.gensalt()),
+                "admin": False,
+                "first_name": user["first_name"],
+                "surname": user["surname"]
+            })
+
+            return http_response("message", "User created", 201)
+        else:
+            return error_response("User already exists", 409)
+    else:
+        return error_response("Invalid user form data", 400)
+
+@app.route(URL_PREFIX + '/user', methods=["GET"])
+@jwt_required
+def get_user_details():
+    token = request.headers['x-access-token']
+    data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+    user = users.find_one({
+        "username": data['user']
+    })
+    if(user):
+        if(len(user['favourite_movies']) >= 1):
+            for movie in user['favourite_movies']:
+                movie['_id'] = str(movie['_id'])
+        user['_id'] = str(user['_id'])
+        del user['password']
+        return http_response_json(user, 200)
+    else:
+        return error_response("User not found", 404)
+
+@app.route(URL_PREFIX + '/user/movie/<string:id>', methods=["POST"])
+@jwt_required
+def add_movie_to_favurites(id):
+    token = request.headers['x-access-token']
+    data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+    user = users.find_one({
+        "username": data['user']
+    })
+    movie = movies.find_one(
+        {
+            "_id": ObjectId(id)
+        },
+        {
+            "_id": 1,
+            "original_title" : 1
+        }
+    )
+    if(movie):
+        users.update_one(
+            {
+                '_id': ObjectId(user['_id'])
+            },
+            {
+                '$push': {
+                    'favourite_movies': movie
+                }
+            }
+        )
+        return http_response("success", "Movie added", 201)
+    else:
+        return error_response("Movie not found", 404)
+
+@app.route(URL_PREFIX + '/user/movie/<string:id>', methods=["DELETE"])
+@jwt_required
+def delete_movie_from_favourites(id):
+    token = request.headers['x-access-token']
+    data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+    user = users.find_one({
+        "username": data['user']
+    })
+    if(user):
+        users.update_one(
+            {
+                '_id': ObjectId(user['_id'])
+            },
+            {
+                "$pull" : {
+                    "favourite_movies" : { 
+                        "_id" : ObjectId(id) 
+                    }
+                }
+            }
+        )
+        return http_response("success", "Movie deleted", 204)
+    else:
+        return error_response("User not found", 404)
 
 @app.route(URL_PREFIX + '/movies', methods=["GET"])
 def show_all_movies():
@@ -232,7 +391,7 @@ def show_one_movie(id):
 @app.route(URL_PREFIX + "/movies", methods=["POST"])
 def add_movie():
     if form_data_is_invalid(movies_required_fields):
-        return error_response("Form data is invalid", 404)
+        return error_response("Form data is invalid", 400)
     new_movie = {}
     number_regex = r'^[0-9]+$'
     for field in movies_required_fields:
@@ -252,7 +411,7 @@ def add_movie():
 def edit_movie(id):
     if id_is_valid(id):
         if form_data_is_invalid(movies_required_fields):
-            return error_response("Missing form data", 404)
+            return error_response("Missing form data", 400)
         else:
             result = movies.update_one(
                 {
@@ -282,6 +441,8 @@ def edit_movie(id):
         return error_response("Invalid movie ID", 404)
 
 @app.route(URL_PREFIX + "/movies/<string:id>", methods=["DELETE"])
+@jwt_required
+@admin_required
 def delete_movie(id):
     if id_is_valid(id):
         delete_result = movies.delete_one({
@@ -300,7 +461,7 @@ def add_movie_review(id):
         movie = movies.find_one({ "_id": ObjectId(id)})
         if movie is not None:
             if form_data_is_invalid(reviews_required_fields):
-                return error_response("Form data is invalid", 404)
+                return error_response("Form data is invalid", 400)
             else:
                 new_review = {
                     '_id': ObjectId(),
@@ -362,6 +523,7 @@ def edit_review(id, r_id):
         }
         movies.update_one(
             {
+                "_id": ObjectId(id),
                 "reviews._id" : ObjectId(r_id)
             },
             {
@@ -369,7 +531,7 @@ def edit_review(id, r_id):
             }
         )
         edited_review_url = API_HOSTNAME + API_PORT + URL_PREFIX + \
-            "movies/" + id + "/reviews/" + r_id
+            "/movies/" + id + "/reviews/" + r_id
         return http_response("url", edited_review_url, 200)
     else:
         error_response("MovieID or ReviewID is invalid", 404)

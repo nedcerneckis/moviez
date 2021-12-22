@@ -21,7 +21,6 @@ export class EditReviewComponent {
     ) {}
 
     ngOnInit(): void {
-        console.log(this.review);
         this.editReviewForm = this.formBuilder.group({
             sentiment: [this.review['sentiment'], Validators.required],
             review: [this.review['review'], Validators.required]
@@ -29,7 +28,6 @@ export class EditReviewComponent {
     }
 
     onSubmitClick(): void {
-        console.log(this.review);
         this.webService.updateReview(
             this.review['_id'],
             this.editReviewForm.value

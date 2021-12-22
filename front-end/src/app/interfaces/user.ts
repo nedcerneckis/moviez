@@ -2,7 +2,8 @@ import { Movie } from "./movie";
 
 export interface User {
     username: string,
+    password: string,
     first_name: string,
-    last_name: string,
-    favouriteMovies: Movie[]
+    surname: string,
+    favouriteMovies?: Movie[]
 }

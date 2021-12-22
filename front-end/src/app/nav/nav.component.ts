@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '@auth0/auth0-angular';
+import { WebService } from '../web.service';
+import { AuthService } from '../auth.service';
+import { User } from '../interfaces/user';
 
 @Component({
     selector: 'navigation',
@@ -8,20 +10,21 @@ import { AuthService } from '@auth0/auth0-angular';
 })
 export class NavComponent implements OnInit {
     profileJson: string = '';
+    user: any;
 
     constructor(
         public authService: AuthService
     ) { }
 
     ngOnInit(): void {
-        this.authService.user$.subscribe((profile: any) => {
-            this.profileJson = JSON.stringify(profile, null, 2);
+        this.authService.getUserDetails().subscribe(user => {
+            this.user = user;
         });
     }
 
-    clearSessionStorage(): void {
-        if(sessionStorage['filters'] && sessionStorage['page']){
-            sessionStorage.clear();
-        }
+    onLogoutSubmit(): void {
+        this.authService.logoutUser().subscribe(() =>
+            window.location.reload()
+        );
     }
 }

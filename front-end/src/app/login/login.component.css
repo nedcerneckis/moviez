@@ -1,0 +1,13 @@
+mat-card {
+    margin: 2em auto;
+    text-align: center;
+    max-width: 500px;
+}
+
+mat-form-field {
+    display: block;
+}
+
+mat-error {
+    padding: 1em;
+}

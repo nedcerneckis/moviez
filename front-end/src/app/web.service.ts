@@ -21,6 +21,10 @@ export class WebService {
         public http: HttpClient,
     ) { }
 
+    getAccessToken(): string {
+        return sessionStorage.getItem('access_token') || '';
+    }
+
     getMoviesByFilters(filters: any, page: number): Observable<any> {
         let filter_string = ''
         for (const filter in filters){
@@ -90,14 +94,13 @@ export class WebService {
         return this.reviewsResults.asObservable();
     }
 
-    postMovie() {
-    }
-
-    updateMovie() {
-    }
-
-    deleteMovie() {
-
+    deleteMovie(id: string) {
+        const http_options = {
+            headers: {
+                "x-access-token": this.getAccessToken()
+            }
+        }
+        return this.http.delete(this.api_full_url + "/movies/" + id, http_options);
     }
 
     postReview(review: Review) {

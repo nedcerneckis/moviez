@@ -10,3 +10,5 @@ client = MongoClient('mongodb://127.0.0.1:27017')
 db = client.moviezDB
 movies = db.movies
 names = db.names
+users = db.users
+blacklist = db.blacklist

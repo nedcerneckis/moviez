@@ -1,0 +1,65 @@
+<mat-card>
+    <mat-card-content>
+        <mat-tab-group dynamicHeight mat-align-tabs="center">
+            <mat-tab label="Login">
+                <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+                    <h2>
+                        Log In
+                    </h2>
+                    <mat-form-field>
+                        <input matInput placeholder="Username" formControlName="username">
+                    </mat-form-field>
+                    <mat-error *ngIf="!loginForm.get('username').valid">
+                        Please enter username in the correct format like: example@mail.com
+                    </mat-error>
+                    <mat-form-field>
+                        <input matInput type="password" placeholder="Password" formControlName="password">
+                    </mat-form-field>
+                    <mat-error *ngIf="!loginForm.get('password').valid">
+                        Please enter password
+                    </mat-error>
+                    <mat-error *ngIf="accountNotFound">
+                        Username or Password is incorrect
+                    </mat-error>
+                    <button mat-raised-button color="primary">
+                        Login
+                    </button>
+                </form>
+            </mat-tab>
+            <mat-tab label="Register">
+                <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+                    <h2>
+                        Register
+                    </h2>
+                    <mat-form-field>
+                        <input matInput placeholder="Username" formControlName="username">
+                    </mat-form-field>
+                    <mat-error *ngIf="!registerForm.get('username').valid">
+                        Please enter username in the correct format like: example@mail.com
+                    </mat-error>
+                    <mat-form-field>
+                        <input required matInput type="password" placeholder="Password" formControlName="password">
+                    </mat-form-field>
+                    <mat-error *ngIf="!registerForm.get('password').valid">
+                        Please enter a password with a minimum of 5 characters
+                    </mat-error>
+                    <mat-form-field>
+                        <input matInput placeholder="First name" formControlName="first_name">
+                    </mat-form-field>
+                    <mat-error *ngIf="!registerForm.get('first_name').valid">
+                        Please enter your first name
+                    </mat-error>
+                    <mat-form-field>
+                        <input matInput placeholder="Surname" formControlName="surname">
+                    </mat-form-field>
+                    <mat-error *ngIf="!registerForm.get('surname').valid">
+                        Please enter your surname
+                    </mat-error>
+                    <button mat-raised-button color="primary">
+                        Register
+                    </button>
+                </form>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card-content>
+</mat-card>
