@@ -35,7 +35,7 @@
                 <button mat-raised-button color="primary" *ngIf="authService.loggedIn" (click)="submitFavouriteMovie(movie._id)">
                     Favourite movie
                 </button>
-                <button mat-raised-button color="warn" *ngIf="user.admin == true" (click)="onMovieDelete(movie._id)">
+                <button mat-raised-button color="warn" *ngIf="user ? user.admin === true : false" (click)="onMovieDelete(movie._id)">
                     Delete movie
                 </button>
             </mat-card-footer>
@@ -44,7 +44,7 @@
     <div class="review-card" *ngFor="let single_review of reviews_list">
         <mat-card class="movie-card">
             <div class="content">
-                <div class="edit-delete-buttons">
+                <div class="edit-delete-buttons" *ngIf="authService.loggedIn">
                     <button 
                     mat-mini-fab 
                     type="submit" 

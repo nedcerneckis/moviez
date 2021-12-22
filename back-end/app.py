@@ -1,12 +1,11 @@
 from os import error
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, request
 from flask_cors import CORS
 from functools import wraps
 from bson import ObjectId
 from bs4 import BeautifulSoup
 import requests
 import json
-import re
 import math
 import jwt
 import datetime
@@ -25,7 +24,6 @@ from utils.config import (
 )
 from utils.fields import ( 
     reviews_required_fields,
-    movies_required_fields,
 )
 
 app = Flask(__name__)
@@ -89,11 +87,6 @@ def login():
             return error_response("Incorrect username", 401)
     else:
         return error_response("Authentication required", 401)
-
-@app.route(URL_PREFIX + '/login/token', methods=["POST"])
-@jwt_required
-def login_token():
-    return http_response("message", "Token is successful", 200)
 
 @app.route(URL_PREFIX + '/logout', methods=["POST"])
 def logout():
@@ -202,7 +195,7 @@ def delete_movie_from_favourites(id):
                 }
             }
         )
-        return http_response("success", "Movie deleted", 204)
+        return http_response_json({}, 204)
     else:
         return error_response("User not found", 404)
 
@@ -389,57 +382,6 @@ def show_one_movie(id):
     else:
         return error_response("Invalid movie ID", 404)
 
-@app.route(URL_PREFIX + "/movies", methods=["POST"])
-def add_movie():
-    if form_data_is_invalid(movies_required_fields):
-        return error_response("Form data is invalid", 400)
-    new_movie = {}
-    number_regex = r'^[0-9]+$'
-    for field in movies_required_fields:
-        match = re.search(number_regex, request.form[field])
-        if match:
-            new_movie[field] = int(request.form[field])
-            continue
-        new_movie[field] = request.form[field]
-    new_movie["reviews"] = []
-    new_movie_id = movies.insert_one(new_movie)
-    new_movie_link = API_HOSTNAME + API_PORT + URL_PREFIX + "/movies/" \
-        + str(new_movie_id.inserted_id)
-
-    return make_response( jsonify( {"url": new_movie_link} ), 201)
-
-@app.route(URL_PREFIX + "/movies/<string:id>", methods=["PUT"])
-def edit_movie(id):
-    if id_is_valid(id):
-        if form_data_is_invalid(movies_required_fields):
-            return error_response("Missing form data", 400)
-        else:
-            result = movies.update_one(
-                {
-                    "_id" : ObjectId(id)
-                },
-                {
-                    "$set" : {
-                        "original_title": request.form["original_title"],
-                        "year": request.form["year"],
-                        "genre": request.form["genre"],
-                        "duration": request.form["duration"],
-                        "language": request.form["language"],
-                        "director": request.form["director"],
-                        "production_company": request.form["production_company"],
-                        "actors": request.form["actors"],
-                        "description": request.form["description"],
-                    }
-                }
-            )
-            if result.matched_count == 1:
-                edited_movie_link = API_HOSTNAME + API_PORT + URL_PREFIX + "/movies/" + id
-                return http_response("url", edited_movie_link, 200)
-            else:
-                return error_response("Movie not found", 404)
-
-    else:
-        return error_response("Invalid movie ID", 404)
 
 @app.route(URL_PREFIX + "/movies/<string:id>", methods=["DELETE"])
 @jwt_required
@@ -457,6 +399,7 @@ def delete_movie(id):
         return error_response("Invalid movie ID", 404)
 
 @app.route(URL_PREFIX + "/movies/<string:id>/reviews", methods=['POST'])
+@jwt_required
 def add_movie_review(id):
     if id_is_valid(id):
         movie = movies.find_one({ "_id": ObjectId(id)})
@@ -516,6 +459,7 @@ def get_movie_reviews(id):
         return error_response("Invalid movie ID", 404)
 
 @app.route(URL_PREFIX + "/movies/<string:id>/reviews/<string:r_id>", methods=["PUT"])
+@jwt_required
 def edit_review(id, r_id):
     if id_is_valid(id) and id_is_valid(r_id):
         edited_review = {
@@ -538,6 +482,7 @@ def edit_review(id, r_id):
         error_response("MovieID or ReviewID is invalid", 404)
 
 @app.route(URL_PREFIX + "/movies/<string:id>/reviews/<string:r_id>", methods=["DELETE"])
+@jwt_required
 def delete_review(id, r_id):
     if id_is_valid(id) and id_is_valid(r_id):
         movies.update_one(

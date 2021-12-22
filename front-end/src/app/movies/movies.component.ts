@@ -15,7 +15,7 @@ export class MoviesComponent implements OnInit {
     page: number = 1;
     maxPage: number = 1;
     myControl = new FormControl();
-    filteredOptions$?: Observable<any>;
+    filteredOptions$?: Observable<any[]>;
     options: string[] = [];
     genre?: string;
     language?: string;
@@ -49,7 +49,7 @@ export class MoviesComponent implements OnInit {
         this.filteredOptions$ = this.myControl.valueChanges.pipe(
             startWith(''),
             map((value: any) => {
-                return typeof value === 'string' && value.length > 3 ? 
+                return typeof value === 'string' && value.length > 2 ? 
                 value : value.original_title
             }),
             map((original_title: any) => {
