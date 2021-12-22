@@ -17,7 +17,10 @@ export class HomeComponent {
     }
 
     ngOnInit(): void {
-        this.getUserDetails();
+        this.authService.getUserDetails().subscribe(data => {
+            this.user = data;
+            this.movies_list = this.user['favourite_movies']
+        });
     }
 
     getUserDetails(): void {

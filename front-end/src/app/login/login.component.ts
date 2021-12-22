@@ -38,6 +38,7 @@ export class LoginComponent implements OnInit {
     onLoginSubmit(): void {
         this.accountNotFound = false;
         this.authService.loginUser(this.loginForm.value).subscribe((data: any) => {
+            this.loginForm.reset()
             this.route.navigateByUrl('/').then()
         },
         () => {
@@ -48,7 +49,8 @@ export class LoginComponent implements OnInit {
 
     onRegisterSubmit(): void {
         this.authService.registerUser(this.registerForm.value).subscribe((data: any) => {
-            console.log(data)
+            this.registerForm.reset()
+            this.route.navigateByUrl('/').then()
         });
     }
 }

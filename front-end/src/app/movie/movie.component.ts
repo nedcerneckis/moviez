@@ -111,6 +111,7 @@ export class MovieComponent implements OnInit {
 
     submitFavouriteMovie(id: string): void {
         this.authService.addMovieFavourite(id).subscribe();
+        this.router.navigate(['/movies']);
     }
 
     fetchReviewList(page: number): void {

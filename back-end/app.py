@@ -121,7 +121,8 @@ def register_new_user():
                 "password": bcrypt.hashpw(bytes(user["password"], "utf-8"), bcrypt.gensalt()),
                 "admin": False,
                 "first_name": user["first_name"],
-                "surname": user["surname"]
+                "surname": user["surname"],
+                "favourite_movies": []
             })
 
             return http_response("message", "User created", 201)
@@ -150,7 +151,7 @@ def get_user_details():
 
 @app.route(URL_PREFIX + '/user/movie/<string:id>', methods=["POST"])
 @jwt_required
-def add_movie_to_favurites(id):
+def add_movie_to_favourites(id):
     token = request.headers['x-access-token']
     data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
     user = users.find_one({
