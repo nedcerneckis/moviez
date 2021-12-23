@@ -21,7 +21,7 @@
                     <mat-error *ngIf="accountNotFound">
                         Username or Password is incorrect
                     </mat-error>
-                    <button mat-raised-button color="primary">
+                    <button [disabled]="!loginForm.valid" mat-raised-button color="primary">
                         Login
                     </button>
                 </form>
@@ -55,7 +55,10 @@
                     <mat-error *ngIf="!registerForm.get('surname').valid">
                         Please enter your surname
                     </mat-error>
-                    <button mat-raised-button color="primary">
+                    <mat-error *ngIf="accountTaken">
+                        This username is taken
+                    </mat-error>
+                    <button [disabled]="!registerForm.valid" mat-raised-button color="primary">
                         Register
                     </button>
                 </form>

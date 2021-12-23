@@ -32,7 +32,7 @@
             </mat-card-actions>
             <mat-card-footer class="footer">
                 <p>Duration: <b>{{ (movie.duration / 60).toFixed(2) }} hours</b></p>
-                <button mat-raised-button color="primary" *ngIf="authService.loggedIn" (click)="submitFavouriteMovie(movie._id)">
+                <button mat-raised-button color="primary" *ngIf="authService.loggedIn && user" (click)="submitFavouriteMovie(movie._id)">
                     Favourite movie
                 </button>
                 <button mat-raised-button color="warn" *ngIf="user ? user.admin === true : false" (click)="onMovieDelete(movie._id)">
@@ -44,7 +44,7 @@
     <div class="review-card" *ngFor="let single_review of reviews_list">
         <mat-card class="movie-card">
             <div class="content">
-                <div class="edit-delete-buttons" *ngIf="authService.loggedIn">
+                <div class="edit-delete-buttons" *ngIf="authService.loggedIn && user">
                     <button 
                     mat-mini-fab 
                     type="submit" 
@@ -83,7 +83,7 @@
             </div>
         </mat-card>
     </div>
-    <ng-container *ngIf="authService.loggedIn;
+    <ng-container *ngIf="authService.loggedIn && user;
     else loggedOut">
     <mat-card>
         <form 

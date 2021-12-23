@@ -14,16 +14,9 @@ export class PaginationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        /*
-        if(sessionStorage['page']){
-            this.page = sessionStorage['page'];
-        }
-        */
     }
 
     updatePagination(): void {
-        /*sessionStorage['page'] = this.page;*/
-        console.log(this.page);
         this.updateItemsList.emit(this.page)
     }
 

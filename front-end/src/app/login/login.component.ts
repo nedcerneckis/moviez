@@ -13,6 +13,7 @@ export class LoginComponent implements OnInit {
     loginForm: any;
     registerForm: any;
     accountNotFound: boolean = false;
+    accountTaken: boolean = false
 
     constructor(
         private formBuilder: FormBuilder,
@@ -43,14 +44,16 @@ export class LoginComponent implements OnInit {
         },
         () => {
             this.accountNotFound = true
-        } 
-        );
+        });
     }
 
     onRegisterSubmit(): void {
         this.authService.registerUser(this.registerForm.value).subscribe((data: any) => {
             this.registerForm.reset()
             this.route.navigateByUrl('/').then()
+        },
+        () => {
+            this.accountTaken = true
         });
     }
 }

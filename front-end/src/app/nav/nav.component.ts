@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { WebService } from '../web.service';
 import { AuthService } from '../auth.service';
-import { User } from '../interfaces/user';
 
 @Component({
     selector: 'navigation',

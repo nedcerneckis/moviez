@@ -104,31 +104,46 @@ export class WebService {
     }
 
     postReview(review: Review) {
+        const http_options = {
+            headers: {
+                "x-access-token": this.getAccessToken()
+            }
+        }
         const postReviewData = new FormData();
         postReviewData.append('sentiment', review.sentiment);
         postReviewData.append('review', review.review);
 
         return this.http.post(this.api_full_url + 
             '/movies/' + this.movieId + '/reviews', 
-            postReviewData
+            postReviewData, http_options
         );
     }
 
     updateReview(id: string, review: Review) {
+        const http_options = {
+            headers: {
+                "x-access-token": this.getAccessToken()
+            }
+        }
         const updateReviewData = new FormData();
         updateReviewData.append('sentiment', review.sentiment);
         updateReviewData.append('review', review.review);
 
         return this.http.put(this.api_full_url + 
             '/movies/' + this.movieId + '/reviews/' + id,
-            updateReviewData
+            updateReviewData , http_options
         );
     }
 
     deleteReview(id: string) {
+        const http_options = {
+            headers: {
+                "x-access-token": this.getAccessToken()
+            }
+        }
         return this.http.delete(this.api_full_url +
             '/movies/' + this.movieId + 
-            '/reviews/' + id
+            '/reviews/' + id, http_options
         );
     }
 }
